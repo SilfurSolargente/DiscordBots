@@ -1,0 +1,42 @@
+import discord
+from discord.ext import commands
+
+class Greetings(commands.Cog):
+    def __init__(self, client):
+        self.client = client
+        self._last_member = None
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        channel = member.guild.system_channel
+        if channel is not None:
+            await channel.send('Welcome {0.mention}'.format(member))
+
+    @commands.command()
+    async def hello(self, ctx, *, member: discord.Member = None):
+        """Says hello"""
+        member = member or ctx.author
+        if self._last_member is None or self._last_member.id != member.id:
+            await ctx.send('Hello {0.name}~'.format(member))
+        else:
+            await ctx.send('Hello {0.name}... This feels familiar.'.format(member))
+        self._last_member = member
+
+    @commands.command()
+    async def goodbye(self, ctx, *, member: discord.Member = None):
+        """Says bye"""
+        member = member or ctx.author
+        if self._last_member is None or self._last_member.id != member.id:
+            await ctx.send('Bye byeee {0.name}~'.format(member))
+        else:
+            await ctx.send('Bye {0.name}... This feels familiar.'.format(member))
+        self._last_member = member
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        channel = guild.system_channel
+        if channel is not None:
+            await channel.send("I am the best and I am now with you !")
+
+def setup(client):
+    client.add_cog(Greetings(client))
